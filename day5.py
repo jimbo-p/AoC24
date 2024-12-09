@@ -61,4 +61,41 @@ good, bad = good_bad_check(rules, updates)
 print("Actual:", middle_value(good))
 
 
+# Part 2
+print("Part 2")
 
+def fix_bad_update(rules, update):
+        good = True
+        for ind, number in enumerate(reversed(update)):
+            if good == False:
+                break
+            for rule in rules:
+                try:
+                    index = update[:(len(update) - ind)].index(rule[1])
+                    if number == rule[0]:
+                        good = False
+                        # swap the numbers in the list where the rule was broken
+                        update[index], update[-(ind+1)] = update[-(ind+1)], update[index]
+                        return fix_bad_update(rules, update)  # Return the recursive call
+                except ValueError:
+                    continue
+        return update  # Return the update when it's good
+
+
+# Test
+rules, updates = read_file('test_data/day5.txt')
+good, bad = good_bad_check(rules, updates)
+
+fixed = []
+for update in bad:
+    fixed.append(fix_bad_update(rules, update))
+print("Test:", middle_value(fixed))
+
+# Actual
+rules, updates = read_file('data/day5.txt')
+good, bad = good_bad_check(rules, updates)
+
+fixed = []
+for update in bad:
+    fixed.append(fix_bad_update(rules, update))
+print("Actual:", middle_value(fixed))
