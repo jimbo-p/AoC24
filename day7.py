@@ -19,21 +19,15 @@ def read_file(file_name):
 # 12553187649483 too low
 
 # add to where I can see what is ruled bad and try to find edge case that is wrong
-
-
 def check_validity(data):
     good_keys = []
-    bad_data = {}
+    bad_data_copy = data.copy()
     for key, values in data.items():
         row_dict = {key: values}
-        valid = False
 
         while True:
             if len(row_dict) == 0:
-                if not valid:
-                    bad_data[key] = values
-                else:
-                    break
+                break
 
             new_dict = {}
             #print("")
@@ -44,7 +38,7 @@ def check_validity(data):
                 if len(v) == 1:
                     if k == v[0]:
                         good_keys.append(key)
-                        valid = True
+                        bad_data_copy.pop(key)
                         #print("Valid key found!: ", k, " with ", v, " original key ", key)
                         break
                     else:
@@ -56,7 +50,7 @@ def check_validity(data):
                 new_dict[k - v[-1]] = v[:-1]
             
             row_dict = new_dict
-    return sum(good_keys), bad_data
+    return sum(good_keys), bad_data_copy
             
 # Test Data
 data = read_file('test_data/day7.txt')
@@ -71,4 +65,3 @@ answer, bad_data = check_validity(data)
 print("Answer: ", answer)
 for key, values in bad_data.items():
     print("Key: ", key, " Values: ", values)
-
