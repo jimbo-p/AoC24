@@ -1,67 +1,86 @@
+from collections import defaultdict
+
 # read in data 
 # it should be read into a dictionary with the kay as the number before the colon and the value as a list of the numbers after the colon
 # each key / value pair corresponds to a row
 
 def read_file(file_name):
-    result = {}
+    keys = []
+    all_values = []
+    
     with open(file_name, 'r') as file:
         for line in file:
-            # Split the line at the colon
             key, values = line.strip().split(':')
-            # Convert the key to int and values to list of integers
-            key = int(key)
+            # Convert key to int and add to keys list
+            keys.append(int(key))
+            # Convert values to list of integers and add to values list
             values = [int(x) for x in values.strip().split()]
-            result[key] = values
-    return result
+            all_values.append(values)
+    
+    return keys, all_values
 
 
 # 11871769086942 too low
 # 12553187649483 too low
+# 12553187650171
 
 # add to where I can see what is ruled bad and try to find edge case that is wrong
-def check_validity(data):
+def check_validity_p1(keys, values):
     good_keys = []
-    bad_data_copy = data.copy()
-    for key, values in data.items():
-        row_dict = {key: values}
+    for i in range(len(keys)):
+        possible_values = [values[i].pop(0)]
+        remaining_values = values[i].copy()
+        
+        while remaining_values:
+            v = remaining_values.pop(0)
+            temp = []
+            for p in possible_values:
+                temp.append(p + v)
+                temp.append(p * v)
+            possible_values = temp
 
-        while True:
-            if len(row_dict) == 0:
-                break
+        if keys[i] in possible_values:
+            good_keys.append(keys[i])
 
-            new_dict = {}
-            #print("")
-            for k, v in row_dict.items():
-                #print("Keys: ", k, " Values: ", v)
+    return sum(good_keys)
 
-                # stopping conditions
-                if len(v) == 1:
-                    if k == v[0]:
-                        good_keys.append(key)
-                        bad_data_copy.pop(key)
-                        #print("Valid key found!: ", k, " with ", v, " original key ", key)
-                        break
-                    else:
-                        continue
-
-                # if k is divisible by the last value in v, need to check for both new keys
-                if k % v[-1] == 0:
-                    new_dict[k // v[-1]] = v[:-1]
-                new_dict[k - v[-1]] = v[:-1]
-            
-            row_dict = new_dict
-    return sum(good_keys), bad_data_copy
-            
 # Test Data
-data = read_file('test_data/day7.txt')
-answer, bad_data = check_validity(data)
+keys, values = read_file('test_data/day7.txt')
+answer = check_validity_p1(keys, values)
 print("Answer: ", answer)
-for key, values in bad_data.items():
-    print("Key: ", key, " Values: ", values)
 
 # Real Data
-data = read_file('data/day7.txt')
-answer, bad_data = check_validity(data)
+keys, values = read_file('data/day7.txt')
+answer = check_validity_p1(keys, values)
 print("Answer: ", answer)
-for key, values in bad_data.items():
-    print("Key: ", key, " Values: ", values)
+
+def check_validity_p2(keys, values):
+    good_keys = []
+    for i in range(len(keys)):
+        possible_values = [values[i].pop(0)]
+        remaining_values = values[i].copy()
+        
+        while remaining_values:
+            v = remaining_values.pop(0)
+            temp = []
+            for p in possible_values:
+                temp.append(p + v)
+                temp.append(p * v)
+                temp.append(int(str(p) + str(v)))
+            possible_values = temp
+
+        if keys[i] in possible_values:
+            good_keys.append(keys[i])
+
+    return sum(good_keys)
+
+# Test Data
+keys, values = read_file('test_data/day7.txt')
+answer = check_validity_p2(keys, values)
+print("Answer: ", answer)
+
+# Real Data
+keys, values = read_file('data/day7.txt')
+answer = check_validity_p2(keys, values)
+print("Answer: ", answer)
+
